@@ -1,10 +1,129 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" 
-              android:orientation="vertical" 
-              android:layout_width="match_parent" 
-              android:layout_height="match_parent">
-  <Button android:id="@+id/myButton" 
-          android:layout_width="match_parent" 
-          android:layout_height="wrap_content" 
-          android:text="@string/hello" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+  <LinearLayout
+      android:id="@+id/linearLayout4"
+      android:orientation="horizontal"
+      android:layout_width="fill_parent"
+      android:layout_height="230.5dp"
+      android:layout_gravity="center_horizontal"
+      android:background="#230045">
+    <ListView
+        android:id="@+id/songListView"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:background="#000000" />
+  </LinearLayout>
+  <LinearLayout
+      android:id="@+id/linearLayout3"
+      android:orientation="horizontal"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center_horizontal">
+    <SeekBar
+        android:id="@+id/songPositionSeekBar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:progress="0" />
+  </LinearLayout>
+  <LinearLayout
+      android:id="@+id/linearLayout1"
+      android:orientation="horizontal"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center_horizontal">
+    <Button
+        android:id="@+id/previousButton"
+        android:drawableTop="@drawable/icon_previous"
+        android:layout_width="70dp"
+        android:layout_height="60dp "
+        android:typeface="monospace"
+        android:layout_gravity="center_vertical"
+        android:textSize="10dp" />
+    <Button
+        android:id="@+id/playButton"
+        android:drawableTop="@drawable/icon_play"
+        android:layout_width="70dp"
+        android:layout_height="60dp "
+        android:typeface="monospace"
+        android:layout_gravity="center_vertical"
+        android:textSize="10dp"/>
+    <Button
+        android:id="@+id/pauseButton"
+        android:drawableTop="@drawable/icon_pause"
+        android:layout_width="70dp"
+        android:layout_height="60dp "
+        android:typeface="monospace"
+        android:layout_gravity="center_vertical"
+        android:textSize="10dp" />
+    <Button
+        android:id="@+id/stopButton"
+        android:drawableTop="@drawable/icon_stop"
+        android:layout_width="70dp"
+        android:layout_height="60dp "
+        android:typeface="monospace"
+        android:layout_gravity="center_vertical"
+        android:textSize="10dp" />
+    <Button
+        android:id="@+id/nextButton"
+        android:drawableTop="@drawable/icon_next"
+        android:layout_width="70dp"
+        android:layout_height="60dp "
+        android:typeface="monospace"
+        android:layout_gravity="center_vertical"
+        android:textSize="10dp" />
+  </LinearLayout>
+  <LinearLayout
+      android:id="@+id/linearLayout2"
+      android:orientation="horizontal"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center_horizontal">
+    <Button
+        android:id="@+id/cameraButton"
+        android:drawableTop="@drawable/icon_camera"
+        android:layout_width="70dp"
+        android:layout_height="60dp "
+        android:typeface="monospace"
+        android:layout_gravity="center_vertical"
+        android:textSize="10dp" />
+    <ToggleButton
+        android:id="@+id/repeatButton"
+        android:checked="false"
+        android:textOn=""
+        android:textOff=""
+        android:drawableTop="@drawable/repeatToggleSelector"
+        android:layout_width="70dp"
+        android:layout_height="60dp "
+        android:typeface="monospace"
+        android:layout_gravity="center_vertical"
+        android:textSize="8dp" />
+    <ToggleButton
+        android:id="@+id/shuffleButton"
+        android:checked="false"
+        android:textOn=""
+        android:textOff=""
+        android:drawableTop="@drawable/shuffleToggleSelector"
+        android:layout_width="70dp"
+        android:layout_height="60dp "
+        android:typeface="monospace"
+        android:layout_gravity="center_vertical"
+        android:textSize="8dp" />
+  </LinearLayout>
+  <LinearLayout
+      android:id="@+id/linearLayout3"
+      android:orientation="horizontal"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center_horizontal">
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:textSize="20sp" />
+  </LinearLayout>
 </LinearLayout>
