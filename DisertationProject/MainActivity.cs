@@ -12,6 +12,12 @@ using System.Collections.Generic;
 using System.Timers;
 using static DisertationProject.Model.Globals;
 
+using Android.Content.PM;
+using Android.Provider;
+using Environment = Android.OS.Environment;
+using Uri = Android.Net.Uri;
+using CameraAppDemo;
+
 namespace DisertationProject
 {
     [Activity(Label = "DisertationProject", MainLauncher = true, Icon = "@mipmap/icon")]
@@ -41,11 +47,68 @@ namespace DisertationProject
 
         private SongCompletionReceiver _songCompletionReceiver;
 
+        protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
+        {
+            base.OnActivityResult(requestCode, resultCode, data);
+
+            // Make it available in the gallery
+
+            Intent mediaScanIntent = new Intent(Intent.ActionMediaScannerScanFile);
+            Uri contentUri = Uri.FromFile(App._file);
+            mediaScanIntent.SetData(contentUri);
+            SendBroadcast(mediaScanIntent);
+
+            // Display in ImageView. We will resize the bitmap to fit the display
+            // Loading the full sized image will consume to much memory 
+            // and cause the application to crash.
+
+            int height = Resources.DisplayMetrics.HeightPixels;
+            int width = _imageView.Height;
+            App.bitmap = App._file.Path.LoadAndResizeBitmap(width, height);
+            if (App.bitmap != null)
+            {
+                _imageView.SetImageBitmap(App.bitmap);
+                App.bitmap = null;
+            }
+
+            // Dispose of the Java side bitmap.
+            GC.Collect();
+        }
+
+        private void CreateDirectoryForPictures()
+        {
+            App._dir = new File(
+                Environment.GetExternalStoragePublicDirectory(
+                    Environment.DirectoryPictures), "CameraAppDemo");
+            if (!App._dir.Exists())
+            {
+                App._dir.Mkdirs();
+            }
+        }
+
+        private bool IsThereAnAppToTakePictures()
+        {
+            Intent intent = new Intent(MediaStore.ActionImageCapture);
+            IList<ResolveInfo> availableActivities =
+                PackageManager.QueryIntentActivities(intent, PackageInfoFlags.MatchDefaultOnly);
+            return availableActivities != null && availableActivities.Count > 0;
+        }
+
+        private void TakeAPicture(object sender, EventArgs eventArgs)
+        {
+            Intent intent = new Intent(MediaStore.ActionImageCapture);
+
+            App._file = new File(App._dir, String.Format("myPhoto_{0}.jpg", Guid.NewGuid()));
+
+            intent.PutExtra(MediaStore.ExtraOutput, Uri.FromFile(App._file));
+
+            StartActivityForResult(intent, 0);
+        }
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.Main);
-            //GetSongList();
             SetupPlaylist();
             SetupButtons();
             SetupTextContainers();
@@ -70,16 +133,23 @@ namespace DisertationProject
             };
 
             RegisterReceiver(_songCompletionReceiver, new IntentFilter("GetNext"));
+
+            if (IsThereAnAppToTakePictures())
+            {
+                CreateDirectoryForPictures();
+
+                Button button = FindViewById<Button>(Resource.Id.cameraButton);
+                _imageView = FindViewById<ImageView>(Resource.Id.imageView1);
+                button.Click += TakeAPicture;
+            }
         }
+
         private void GetSongList()
         {
             var response = DataController.Instance.GetSongs();
             if (response.Status == GenericStatus.Success)
             {
-                _playList = new Playlist
-                {
-                    SongList = response.Result
-                };
+                _playList = new Playlist(response.Result);
             };
         }
 
@@ -97,7 +167,6 @@ namespace DisertationProject
             };
 
             _playList = new Playlist(songList);
-
         }
 
         private void ChangeColorOfButton(object sender, EventArgs args)
@@ -121,7 +190,7 @@ namespace DisertationProject
 
             playButton.Click += ChangeColorOfButton;
 
-           
+
 
             var pauseButton = FindViewById<Button>(Resource.Id.pauseButton);
             pauseButton.Click += (sender, args) => SendCommand(ActionEvent.ActionPause);
@@ -195,15 +264,15 @@ namespace DisertationProject
         /// </summary>
         public void SetupTextContainers()
         {
-            _textView = FindViewById<TextView>(Resource.Id.textView1);
+            //_textView = FindViewById<TextView>(Resource.Id.textView1);
             _listView = FindViewById<ListView>(Resource.Id.songListView);
-            _songListAdapter = new SonglistAdapter(this, _playList.SongList);
+            _songListAdapter = new SonglistAdapter(this, _playList.GetSongList());
             _listView.Adapter = _songListAdapter;
             _listView.ItemClick += (sender, args) =>
             {
                 SendCommand(ActionEvent.ActionStop);
                 var currentPosition = args.Position;
-                _playList.Position = currentPosition;
+                _playList.SetPosition(currentPosition);
                 var name = _playList.GetCurrentSong().Name;
                 var source = _playList.GetCurrentSong().Source;
                 SendCommand(ActionEvent.ActionPlay, source, name);

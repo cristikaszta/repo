@@ -17,7 +17,7 @@
     <AndroidResgenClass>Resource</AndroidResgenClass>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <AndroidUseLatestPlatformSdk>True</AndroidUseLatestPlatformSdk>
-    <TargetFrameworkVersion>v7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v6.0</TargetFrameworkVersion>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
     <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
     <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
@@ -59,18 +59,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Adapters\SonglistAdapter.cs" />
-    <Compile Include="App.cs" />
     <Compile Include="BroadcastReceiver\SongCompletionReceiver.cs" />
-    <Compile Include="Common\BitmapHelpers.cs" />
     <Compile Include="Controllers\DataController.cs" />
     <Compile Include="Controllers\LocationController.cs" />
     <Compile Include="Controllers\NetworkController.cs" />
     <Compile Include="MainActivity.cs" />
-    <Compile Include="Common\Enumerations.cs" />
-    <Compile Include="Common\GenericResponse.cs" />
-    <Compile Include="Common\GenericStatus.cs" />
-    <Compile Include="Common\Globals.cs" />
-    <Compile Include="Common\Helper.cs" />
+    <Compile Include="Models\Enumerations.cs" />
+    <Compile Include="Models\GenericResponse.cs" />
+    <Compile Include="Models\GenericStatus.cs" />
+    <Compile Include="Models\Globals.cs" />
+    <Compile Include="Models\Helper.cs" />
     <Compile Include="Models\Playlist.cs" />
     <Compile Include="Models\Song.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />

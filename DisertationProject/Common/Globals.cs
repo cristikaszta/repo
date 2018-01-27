@@ -10,12 +10,6 @@ namespace DisertationProject.Model
 
         public const string ConnectionString = "Server=tcp:sv456.database.windows.net,1433;Initial Catalog=db0542;Persist Security Info=False;User ID=qazkjjj;Password=38ghTQQz!;MultipleActiveResultSets=False;Encrypt=False;Connection Timeout=30;";
         public const string FileStorage = @"https://store443.file.core.windows.net/fileshare3/Songs/";
-        public const int MainLayoutId = Resource.Layout.Main;
-        public const int ErrorTextBox = Resource.Id.textView1;
-        public const int SongListView = Resource.Id.songListView;
-
-        //Labels
-        public const string PROJECT_LABEL = "DisertationProject";
 
         public static class Songs
         {

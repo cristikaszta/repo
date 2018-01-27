@@ -23,17 +23,14 @@ namespace DisertationProject.Model
         /// <summary>
         /// The total items in the playlist
         /// </summary>
-        private int totalItems;
+        private int _totalItems;
 
         /// <summary>
         /// The current position in the playlist
         /// </summary>
-        public int Position { get; set; }
+        private int _position;
 
-        /// <summary>
-        /// The song list
-        /// </summary>
-        public List<Song> SongList;
+        private List<Song> _songList;
 
         /// <summary>
         /// Suffle property
@@ -52,7 +49,7 @@ namespace DisertationProject.Model
         {
             get
             {
-                if (Position == totalItems - 1)
+                if (_position == _totalItems - 1)
                     return true;
                 return false;
             }
@@ -65,7 +62,7 @@ namespace DisertationProject.Model
         {
             get
             {
-                if (Position == 0)
+                if (_position == 0)
                     return true;
                 return false;
             }
@@ -74,26 +71,14 @@ namespace DisertationProject.Model
         /// <summary>
         /// Constructor
         /// </summary>
-        public Playlist()
-        {
-            Position = 0;
-            Shuffle = false;
-            Repeat = false;
-            SongList = new List<Song>();
-            totalItems = 0;
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
         /// <_parameter name="trackList">The tracklist</_parameter>
-        public Playlist(List<Song> trackList)
+        public Playlist(List<Song> songList)
         {
-            Position = 0;
+            _position = 0;
             Shuffle = false;
             Repeat = false;
-            SongList = trackList;
-            totalItems = trackList.Count;
+            _songList = songList;
+            _totalItems = songList.Count;
         }
 
         /// <summary>
@@ -101,8 +86,8 @@ namespace DisertationProject.Model
         /// </summary>
         public void Add(Song item)
         {
-            SongList.Add(item);
-            totalItems++;
+            _songList.Add(item);
+            _totalItems++;
         }
 
         /// <summary>
@@ -110,8 +95,8 @@ namespace DisertationProject.Model
         /// </summary>
         public void Add(List<Song> items)
         {
-            SongList.AddRange(items);
-            totalItems += items.Count();
+            _songList.AddRange(items);
+            _totalItems += items.Count();
         }
 
         /// <summary>
@@ -119,10 +104,10 @@ namespace DisertationProject.Model
         /// </summary>
         public void Remove(Song item)
         {
-            if (SongList.Any())
+            if (_songList.Any())
             {
-                SongList.Remove(item);
-                totalItems--;
+                _songList.Remove(item);
+                _totalItems--;
             }
         }
 
@@ -132,7 +117,7 @@ namespace DisertationProject.Model
         /// <returns>Current song</returns>
         public Song GetCurrentSong()
         {
-            return SongList[Position];
+            return _songList[_position];
         }
 
         /// <summary>
@@ -143,10 +128,10 @@ namespace DisertationProject.Model
             if (Shuffle)
             {
                 var random = new Random();
-                Position = random.Next(0, totalItems - 1);
+                _position = random.Next(0, _totalItems - 1);
             }
-            else if (Position < totalItems - 1)
-                Position++;
+            else if (_position < _totalItems - 1)
+                _position++;
         }
 
         /// <summary>
@@ -157,10 +142,10 @@ namespace DisertationProject.Model
             if (Shuffle)
             {
                 var random = new Random();
-                Position = random.Next(0, totalItems - 1);
+                _position = random.Next(0, _totalItems - 1);
             }
-            else if (Position > 0)
-                Position--;
+            else if (_position > 0)
+                _position--;
         }
 
         /// <summary>
@@ -168,7 +153,7 @@ namespace DisertationProject.Model
         /// </summary>
         public void ResetPosition()
         {
-            Position = 0;
+            _position = 0;
         }
 
         /// <summary>
@@ -176,7 +161,20 @@ namespace DisertationProject.Model
         /// </summary>
         public void SetPositionToEnd()
         {
-            Position = totalItems - 1;
+            _position = _totalItems - 1;
+        }
+
+        public void SetPosition(int position)
+        {
+            if (0 <= position && position <= _totalItems)
+                _position = position;
+            else
+                throw new InvalidOperationException("Position is not valid!");
+        }
+
+        internal List<Song> GetSongList()
+        {
+            return _songList;
         }
     }
 }

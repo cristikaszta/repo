@@ -133,6 +133,9 @@ namespace DisertationProject
 			// aapt resource value: 0x7f08000b
 			public const int cameraButton = 2131230731;
 			
+			// aapt resource value: 0x7f08000e
+			public const int imageView1 = 2131230734;
+			
 			// aapt resource value: 0x7f080004
 			public const int linearLayout1 = 2131230724;
 			
@@ -171,9 +174,6 @@ namespace DisertationProject
 			
 			// aapt resource value: 0x7f080008
 			public const int stopButton = 2131230728;
-			
-			// aapt resource value: 0x7f08000e
-			public const int textView1 = 2131230734;
 			
 			static Id()
 			{
