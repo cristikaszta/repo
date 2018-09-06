@@ -13,8 +13,11 @@ using Android.Runtime;
 using System.Threading.Tasks;
 using System.Text;
 
-namespace DisertationProject.Controller
+namespace DisertationProject.Controllers
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class LocationController
     {
 

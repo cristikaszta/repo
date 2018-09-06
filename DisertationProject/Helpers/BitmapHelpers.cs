@@ -1,11 +1,19 @@
+using Android.Graphics;
+
 namespace CameraAppDemo
 {
-    using System.IO;
-
-    using Android.Graphics;
-
+    /// <summary>
+    /// 
+    /// </summary>
     public static class BitmapHelpers
     {
+        /// <summary>
+        /// Loads the and resize bitmap.
+        /// </summary>
+        /// <param name="fileName">Name of the file.</param>
+        /// <param name="width">The width.</param>
+        /// <param name="height">The height.</param>
+        /// <returns></returns>
         public static Bitmap LoadAndResizeBitmap(this string fileName, int width, int height)
         {
             // First we get the the dimensions of the file on disk

@@ -1,39 +1,48 @@
 ﻿namespace DisertationProject.Model
 {
     /// <summary>
-    /// Song class
+    /// Song model
     /// </summary>
     public class Song
     {
         /// <summary>
         /// Id of the song
         /// </summary>
+        /// <value>
+        /// The identifier.
+        /// </value>
         public long Id { get; set; }
 
         /// <summary>
         /// Name of the song
         /// </summary>
-        public string Name { get; set; }
+        /// <value>
+        /// The name.
+        /// </value>
+        public string Title { get; set; }
 
         /// <summary>
         /// Source of the song
         /// </summary>
+        /// <value>
+        /// The source.
+        /// </value>
         public string Source { get; set; }
 
         /// <summary>
         /// Artist name
         /// </summary>
+        /// <value>
+        /// The artist.
+        /// </value>
         public string Artist { get; set; }
-
-        /// <summary>
-        /// Artist name
-        /// </summary>
-        public int Playlist { get; set; }
 
         /// <summary>
         /// Emotion
         /// </summary>
-        public Emotion Emotion { get; set; }
-
+        /// <value>
+        /// The emotion.
+        /// </value>
+        public Emotion Group { get; set; }
     }
 }

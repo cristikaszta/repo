@@ -1,8 +1,9 @@
 using Android.App;
 using Android.Net;
 using Android.Net.Wifi;
+using System;
 
-namespace DisertationProject.Controller
+namespace DisertationProject.Controllers
 {
     /// <summary>
     /// Network controller class
@@ -12,42 +13,76 @@ namespace DisertationProject.Controller
         /// <summary>
         /// Conectivity manager
         /// </summary>
-        private ConnectivityManager connectivityManager;
+        private ConnectivityManager _connectivityManager;
+
+        private static NetworkController _instance;
+
+        public static NetworkController Instance
+        {
+            get
+            {
+                if(_instance == null)
+                {
+                    _instance = new NetworkController();
+                }
+                return _instance;
+            }
+        }
 
         /// <summary>
         /// Wifi manager
         /// </summary>
-        private WifiManager wifiManager;
+        private WifiManager _wifiManager;
 
         /// <summary>
         /// Wifi lock used so that music stream oever wifi even when phone is locked
         /// </summary>
-        private WifiManager.WifiLock wifiLock;
+        private WifiManager.WifiLock _wifiLock;
 
-
+       
         /// <summary>
         /// Check is connected to the network
         /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance is connected; otherwise, <c>false</c>.
+        /// </value>
+        //public bool IsConnected
+        //{
+        //    get
+        //    {
+        //        if (_connectivityManager.GetNetworkInfo(ConnectivityType.Wifi).IsConnected ||
+        //            _connectivityManager.GetNetworkInfo(ConnectivityType.Mobile).IsConnected)
+        //            return true;
+        //        else
+        //            return false;
+        //    }
+        //}
+
         public bool IsConnected
         {
             get
             {
-                if (connectivityManager.GetNetworkInfo(ConnectivityType.Wifi).IsConnected ||
-                    connectivityManager.GetNetworkInfo(ConnectivityType.Mobile).IsConnected)
-                    return true;
-                else
+                try
+                {
+                    var activeConnection = _connectivityManager.ActiveNetworkInfo;
+                    return ((activeConnection != null) && activeConnection.IsConnected);
+                }
+                catch (Exception e)
+                {
+                    //TODO log error
                     return false;
+                }
             }
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public NetworkController()
+        private NetworkController()
         {
-            wifiManager = (WifiManager)Application.Context.GetSystemService(Android.Content.Context.WifiService);
-            connectivityManager = (ConnectivityManager)Application.Context.GetSystemService(Android.Content.Context.ConnectivityService);
-            wifiLock = wifiManager.CreateWifiLock(WifiMode.Full, "Wifi lock");
+            _wifiManager = (WifiManager)Application.Context.GetSystemService(Android.Content.Context.WifiService);
+            _connectivityManager = (ConnectivityManager)Application.Context.GetSystemService(Android.Content.Context.ConnectivityService);
+            _wifiLock = _wifiManager.CreateWifiLock(WifiMode.Full, "Wifi lock");
         }
 
         /// <summary>
@@ -55,8 +90,8 @@ namespace DisertationProject.Controller
         /// </summary>
         public void AquireWifiLock()
         {
-            if (!wifiLock.IsHeld)
-                wifiLock.Acquire();
+            if (!_wifiLock.IsHeld)
+                _wifiLock.Acquire();
         }
 
         /// <summary>
@@ -64,8 +99,8 @@ namespace DisertationProject.Controller
         /// </summary>
         public void ReleaseWifiLock()
         {
-            if (wifiLock.IsHeld)
-                wifiLock.Release();
+            if (_wifiLock.IsHeld)
+                _wifiLock.Release();
         }
     }
 }

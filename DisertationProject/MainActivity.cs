@@ -1,28 +1,37 @@
 ﻿using Android.App;
 using Android.Content;
+using Android.Content.PM;
 using Android.Graphics;
+using Android.Net;
 using Android.OS;
+using Android.Provider;
 using Android.Widget;
+using CameraAppDemo;
 using DisertationProject.Adapters;
-using DisertationProject.Controller;
+using DisertationProject.Controllers;
+using DisertationProject.Helpers;
 using DisertationProject.Model;
+using DisertationProject.Services;
 using Java.IO;
 using System;
 using System.Collections.Generic;
 using System.Timers;
 using static DisertationProject.Model.Globals;
-
-using Android.Content.PM;
-using Android.Provider;
 using Environment = Android.OS.Environment;
 using Uri = Android.Net.Uri;
-using CameraAppDemo;
 
 namespace DisertationProject
 {
+    /// <summary>
+    /// Main Activity
+    /// </summary>
+    /// <seealso cref="Android.App.Activity" />
     [Activity(Label = "DisertationProject", MainLauncher = true, Icon = "@mipmap/icon")]
-    public class MainActivity : Activity
+    public sealed class MainActivity : Activity
     {
+        /// <summary>
+        /// The image view
+        /// </summary>
         private ImageView _imageView;
 
         /// <summary>
@@ -43,10 +52,28 @@ namespace DisertationProject
         /// <summary>
         /// Playlist
         /// </summary>
+        /// <value>
+        /// The play list.
+        /// </value>
         public Playlist _playList { get; set; }
 
+        /// <summary>
+        /// The song completion receiver
+        /// </summary>
         private SongCompletionReceiver _songCompletionReceiver;
 
+        /// <summary>
+        /// Called when an activity you launched exits, giving you the requestCode
+        /// you started it with, the resultCode it returned, and any additional
+        /// data from it.
+        /// </summary>
+        /// <param name="requestCode">The integer request code originally supplied to
+        /// startActivityForResult(), allowing you to identify who this
+        /// result came from.</param>
+        /// <param name="resultCode">The integer result code returned by the child activity
+        /// through its setResult().</param>
+        /// <param name="data">An Intent, which can return result data to the caller
+        /// (various data can be attached to Intent "extras").</param>
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
             base.OnActivityResult(requestCode, resultCode, data);
@@ -59,7 +86,7 @@ namespace DisertationProject
             SendBroadcast(mediaScanIntent);
 
             // Display in ImageView. We will resize the bitmap to fit the display
-            // Loading the full sized image will consume to much memory 
+            // Loading the full sized image will consume to much memory
             // and cause the application to crash.
 
             int height = Resources.DisplayMetrics.HeightPixels;
@@ -75,6 +102,9 @@ namespace DisertationProject
             GC.Collect();
         }
 
+        /// <summary>
+        /// Creates the directory for pictures.
+        /// </summary>
         private void CreateDirectoryForPictures()
         {
             App._dir = new File(
@@ -86,6 +116,12 @@ namespace DisertationProject
             }
         }
 
+        /// <summary>
+        /// Determines whether [is there an application to take pictures].
+        /// </summary>
+        /// <returns>
+        ///   <c>true</c> if [is there an application to take pictures]; otherwise, <c>false</c>.
+        /// </returns>
         private bool IsThereAnAppToTakePictures()
         {
             Intent intent = new Intent(MediaStore.ActionImageCapture);
@@ -94,6 +130,11 @@ namespace DisertationProject
             return availableActivities != null && availableActivities.Count > 0;
         }
 
+        /// <summary>
+        /// Takes a picture.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="eventArgs">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void TakeAPicture(object sender, EventArgs eventArgs)
         {
             Intent intent = new Intent(MediaStore.ActionImageCapture);
@@ -105,6 +146,10 @@ namespace DisertationProject
             StartActivityForResult(intent, 0);
         }
 
+        /// <summary>
+        /// Called when the activity is starting.
+        /// </summary>
+        /// <param name="savedInstanceState">If the activity is being re-initialized after
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -144,31 +189,34 @@ namespace DisertationProject
             }
         }
 
+        /// <summary>
+        /// Gets the song list.
+        /// </summary>
         private void GetSongList()
         {
             var response = DataController.Instance.GetSongs();
-            if (response.Status == GenericStatus.Success)
+            if (response.Status == Status.Success)
             {
                 _playList = new Playlist(response.Result);
             };
         }
+
 
         /// <summary>
         /// Setup playlist
         /// </summary>
         private void SetupPlaylist()
         {
-            var songList = new List<Song>
-            {
-                new Song {Id = 101, Artist = "Trumpet", Name = "March", Emotion = Emotion.Happy, Source = Songs.SampleSong1},
-                new Song {Id = 102, Artist = "Russia", Name = "Katyusha", Emotion = Emotion.Happy, Source = Songs.SampleSong2},
-                new Song {Id = 103, Artist = "America", Name = "Yankee Doodle Dandy", Emotion = Emotion.Happy, Source = Songs.SampleSong3},
-                new Song {Id = 104, Artist = "Romania", Name = "National Anthem", Emotion = Emotion.Happy, Source = Songs.SampleSong4}
-            };
+            var songList = DataController.Instance.GetTestSongs().Result;
 
             _playList = new Playlist(songList);
         }
 
+        /// <summary>
+        /// Changes the color of button.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="args">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void ChangeColorOfButton(object sender, EventArgs args)
         {
             Button button = (Button)sender;
@@ -178,19 +226,20 @@ namespace DisertationProject
             timer.Start();
         }
 
+        /// <summary>
+        /// Setups the buttons.
+        /// </summary>
         private void SetupButtons()
         {
             var playButton = FindViewById<Button>(Resource.Id.playButton);
             playButton.Click += (sender, args) =>
             {
-                var name = _playList.GetCurrentSong().Name;
+                var name = _playList.GetCurrentSong().Title;
                 var source = _playList.GetCurrentSong().Source;
                 SendCommand(ActionEvent.ActionPlay, source, name);
             };
 
-            playButton.Click += ChangeColorOfButton;
-
-
+            //playButton.Click += ChangeColorOfButton;
 
             var pauseButton = FindViewById<Button>(Resource.Id.pauseButton);
             pauseButton.Click += (sender, args) => SendCommand(ActionEvent.ActionPause);
@@ -213,8 +262,8 @@ namespace DisertationProject
                 {
                     return;
                 }
-                var name = _playList.GetCurrentSong().Name;
-                var source = _playList.GetCurrentSong().Source;
+                string name = _playList.GetCurrentSong().Title;
+                string source = _playList.GetCurrentSong().Source;
                 SendCommand(ActionEvent.ActionStop);
                 SendCommand(ActionEvent.ActionPlay, source, name);
             };
@@ -234,7 +283,7 @@ namespace DisertationProject
                 {
                     return;
                 }
-                var name = _playList.GetCurrentSong().Name;
+                var name = _playList.GetCurrentSong().Title;
                 var source = _playList.GetCurrentSong().Source;
                 SendCommand(ActionEvent.ActionStop);
                 SendCommand(ActionEvent.ActionPlay, source, name);
@@ -273,7 +322,7 @@ namespace DisertationProject
                 SendCommand(ActionEvent.ActionStop);
                 var currentPosition = args.Position;
                 _playList.SetPosition(currentPosition);
-                var name = _playList.GetCurrentSong().Name;
+                var name = _playList.GetCurrentSong().Title;
                 var source = _playList.GetCurrentSong().Source;
                 SendCommand(ActionEvent.ActionPlay, source, name);
             };
@@ -285,22 +334,36 @@ namespace DisertationProject
         /// <param name="action">The intended ation</param>
         public void SendCommand(ActionEvent action)
         {
-            var stringifiedAction = Helper.ConvertActionEvent(action);
+            //var stringifiedAction = Helper.ConvertActionEvent(action);
+            var stringifiedAction = action.ToString();
             var intent = new Intent(stringifiedAction, null, this, typeof(MusicService));
             StartService(intent);
         }
 
+        /// <summary>
+        /// Sends the command.
+        /// </summary>
+        /// <param name="action">The action.</param>
+        /// <param name="source">The source.</param>
         public void SendCommand(ActionEvent action, string source)
         {
-            var stringifiedAction = Helper.ConvertActionEvent(action);
+            //var stringifiedAction = Helper.ConvertActionEvent(action);
+            var stringifiedAction = action.ToString();
             var intent = new Intent(stringifiedAction, null, this, typeof(MusicService));
             intent.PutExtra("source", source);
             StartService(intent);
         }
 
+        /// <summary>
+        /// Sends the command.
+        /// </summary>
+        /// <param name="action">The action.</param>
+        /// <param name="source">The source.</param>
+        /// <param name="name">The name.</param>
         public void SendCommand(ActionEvent action, string source, string name)
         {
-            var stringifiedAction = Helper.ConvertActionEvent(action);
+            //var stringifiedAction = Helper.ConvertActionEvent(action);
+            var stringifiedAction = action.ToString();
             var intent = new Intent(stringifiedAction, null, this, typeof(MusicService));
             intent.PutExtra("source", source);
             intent.PutExtra("name", name);
@@ -308,4 +371,3 @@ namespace DisertationProject
         }
     }
 }
-

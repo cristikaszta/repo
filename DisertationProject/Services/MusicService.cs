@@ -2,16 +2,16 @@
 using Android.Content;
 using Android.Media;
 using Android.OS;
+using DisertationProject.Controllers;
 using DisertationProject.Model;
 using System;
-using System.Collections.Generic;
-using static DisertationProject.Model.Globals;
 
-namespace DisertationProject.Controller
+namespace DisertationProject.Services
 {
     /// <summary>
     /// Music service
     /// </summary>
+    /// <seealso cref="Android.App.Service" />
     [Service]
     [IntentFilter(new[] { "ActionPlay",   "ActionPause", "ActionStop",
                           "ActionPrevious","ActionNext",
@@ -22,11 +22,6 @@ namespace DisertationProject.Controller
         /// Intent
         /// </summary>
         public Intent intent;
-
-        /// <summary>
-        /// Network controller
-        /// </summary>
-        private NetworkController networkController;
 
         /// <summary>
         /// Notification Id
@@ -43,22 +38,25 @@ namespace DisertationProject.Controller
         /// </summary>
         private AudioManager audioManager;
 
+        /// <summary>
+        /// The song name
+        /// </summary>
         private string _songName = "SongName";
 
+        /// <summary>
+        /// The artist name
+        /// </summary>
         private string _artistName = "ArtistName";
 
         /// <summary>
         /// State
         /// </summary>
+        /// <value>
+        /// The state.
+        /// </value>
         public PlayState State { get; private set; }
 
-        /// <summary>
-        /// On bind
-        /// Don't do anything on bind
-        /// </summary>
-        /// <param name="intent">The intent</param>
-        /// <returns></returns>
-        public override IBinder OnBind(Intent intent) { throw new NotImplementedException(); }
+        public override IBinder OnBind(Intent intent) { return null; }
 
         /// <summary>
         /// On create simply detect some of our managers
@@ -66,11 +64,13 @@ namespace DisertationProject.Controller
         public override void OnCreate()
         {
             base.OnCreate();
-            networkController = new NetworkController();
             InitializeMediaPlayer();
             //PlayList = new Playlist();
         }
 
+        /// <summary>
+        /// Initializes the media player.
+        /// </summary>
         private void InitializeMediaPlayer()
         {
             audioManager = (AudioManager)Application.Context.GetSystemService(AudioService);
@@ -102,16 +102,19 @@ namespace DisertationProject.Controller
         /// <param name="intent">The intent</param>
         /// <param name="flags">The start command flags</param>
         /// <param name="startId">Start id</param>
-        /// <returns>Start command result</returns>
+        /// <returns>
+        /// Start command result
+        /// </returns>
         public override StartCommandResult OnStartCommand(Intent intent, StartCommandFlags flags, int startId)
         {
-            var action = Helper.ConvertActionEvent(intent.Action);
+            ActionEvent action = (ActionEvent)Enum.Parse(typeof(ActionEvent), intent.Action);
             switch (action)
             {
                 case ActionEvent.ActionPlay:
                     var source = intent.GetStringExtra("source");
                     Play(source);
                     break;
+
                 case ActionEvent.ActionStop: Stop(); break;
                 case ActionEvent.ActionPause: Pause(); break;
             }
@@ -119,9 +122,13 @@ namespace DisertationProject.Controller
             return StartCommandResult.Sticky;
         }
 
+        /// <summary>
+        /// Plays the specified URI.
+        /// </summary>
+        /// <param name="uri">The URI.</param>
         private async void Play(string uri)
         {
-            if (!networkController.IsConnected)
+            if (!NetworkController.Instance.IsConnected)
             {
                 Stop();
                 return;
@@ -141,9 +148,9 @@ namespace DisertationProject.Controller
                 MediaPlayer.Reset();
                 await MediaPlayer.SetDataSourceAsync(Application.Context, Android.Net.Uri.Parse(uri));
                 MediaPlayer.PrepareAsync();
-                networkController.AquireWifiLock();
+                NetworkController.Instance.AquireWifiLock();
                 StartForeground("Playing ", _artistName, _songName);
-                networkController.AquireWifiLock();
+                NetworkController.Instance.AquireWifiLock();
             }
             catch (Java.Lang.IllegalStateException ex)
             {
@@ -151,6 +158,12 @@ namespace DisertationProject.Controller
             }
         }
 
+        /// <summary>
+        /// Plays the specified URI.
+        /// </summary>
+        /// <param name="uri">The URI.</param>
+        /// <param name="name">The name.</param>
+        /// <param name="artist">The artist.</param>
         private void Play(string uri, string name, string artist)
         {
             _songName = name;
@@ -180,13 +193,15 @@ namespace DisertationProject.Controller
             MediaPlayer.Reset();
             State = PlayState.Stopped;
             StopForeground(true);
-            networkController.ReleaseWifiLock();
+            NetworkController.Instance.ReleaseWifiLock();
         }
 
         /// <summary>
         /// Get the duration of the current song
         /// </summary>
-        /// <returns>The duration of the current playing song</returns>
+        /// <returns>
+        /// The duration of the current playing song
+        /// </returns>
         private int GetSongDuration()
         {
             var duration = 0;
@@ -204,7 +219,9 @@ namespace DisertationProject.Controller
         /// <summary>
         /// Get the position of the current song playing
         /// </summary>
-        /// <returns>The position of the current playing song</returns>
+        /// <returns>
+        /// The position of the current playing song
+        /// </returns>
         public int GetCurrentPosition()
         {
             var position = 0;
@@ -222,6 +239,19 @@ namespace DisertationProject.Controller
         /// <summary>
         /// Properly cleanup of your player by releasing resources
         /// </summary>
+        /// <remarks>
+        /// <para tool="javadoc-to-mdoc">Called by the system to notify a Service that it is no longer used and is being removed.  The
+        /// service should clean up any resources it holds (threads, registered
+        /// receivers, etc) at this point.  Upon return, there will be no more calls
+        /// in to this Service object and it is effectively dead.  Do not call this method directly.
+        /// </para>
+        /// <para tool="javadoc-to-mdoc">
+        ///   <format type="text/html">
+        ///     <a href="http://developer.android.com/reference/android/app/Service.html#onDestroy()" target="_blank">[Android Documentation]</a>
+        ///   </format>
+        /// </para>
+        /// </remarks>
+        /// <since version="Added in API level 1" />
         public override void OnDestroy()
         {
             base.OnDestroy();
@@ -237,6 +267,9 @@ namespace DisertationProject.Controller
         /// When we start on the foreground we will present a notification to the user
         /// When they press the notification it will take them to the main page so they can control the music
         /// </summary>
+        /// <param name="title">The title.</param>
+        /// <param name="artist">The artist.</param>
+        /// <param name="song">The song.</param>
         private void StartForeground(string title, string artist, string song)
         {
             var pendingIntent = PendingIntent.GetActivity(Application.Context, 0, new Intent(Application.Context, typeof(MainActivity)), PendingIntentFlags.UpdateCurrent);
