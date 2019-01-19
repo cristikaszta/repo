@@ -1,4 +1,5 @@
-﻿using Android.App;
+﻿using Android;
+using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.Graphics;
@@ -61,6 +62,13 @@ namespace DisertationProject
         /// The song completion receiver
         /// </summary>
         private SongCompletionReceiver _songCompletionReceiver;
+
+        readonly string[] permissions =
+        {
+            Manifest.Permission.Camera,
+            Manifest.Permission.ReadExternalStorage,
+            Manifest.Permission.WriteExternalStorage,
+        };
 
         /// <summary>
         /// Called when an activity you launched exits, giving you the requestCode
@@ -139,18 +147,33 @@ namespace DisertationProject
         {
             Intent intent = new Intent(MediaStore.ActionImageCapture);
 
-            App._file = new File(App._dir, String.Format("myPhoto_{0}.jpg", Guid.NewGuid()));
+            App._file = new File(App._dir, string.Format("myPhoto_{0}.jpg", Guid.NewGuid()));
 
-            intent.PutExtra(MediaStore.ExtraOutput, Uri.FromFile(App._file));
+            Uri imageUri = Android.Support.V4.Content.FileProvider.GetUriForFile(
+            this,
+            "com.example.homefolder.example.provider", //(use your app signature + ".provider" )
+            App._file);
+
+            //intent.PutExtra(MediaStore.ExtraOutput, Uri.FromFile(App._file));
+            intent.PutExtra(MediaStore.ExtraOutput, imageUri);
+
+
 
             StartActivityForResult(intent, 0);
+
+
+
+            //var photo = await Plugin.Media.CrossMedia.Current.TakePhotoAsync(new Plugin.Media.Abstractions.StoreCameraMediaOptions() { });
+
+            //if (photo != null)
+            //    PhotoImage.Source = ImageSource.FromStream(() => { return photo.GetStream(); });
         }
 
         /// <summary>
         /// Called when the activity is starting.
         /// </summary>
         /// <param name="savedInstanceState">If the activity is being re-initialized after
-        protected override void OnCreate(Bundle savedInstanceState)
+        protected override async void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.Main);
@@ -178,6 +201,8 @@ namespace DisertationProject
             };
 
             RegisterReceiver(_songCompletionReceiver, new IntentFilter("GetNext"));
+
+            RequestPermissions(permissions, 0);
 
             if (IsThereAnAppToTakePictures())
             {

@@ -44,20 +44,20 @@ namespace DisertationProject
 		public partial class Color
 		{
 			
-			// aapt resource value: 0x7f060000
-			public const int background = 2131099648;
+			// aapt resource value: 0x7f070000
+			public const int background = 2131165184;
 			
-			// aapt resource value: 0x7f060001
-			public const int black = 2131099649;
+			// aapt resource value: 0x7f070001
+			public const int black = 2131165185;
 			
-			// aapt resource value: 0x7f060003
-			public const int blue = 2131099651;
+			// aapt resource value: 0x7f070003
+			public const int blue = 2131165187;
 			
-			// aapt resource value: 0x7f060004
-			public const int green = 2131099652;
+			// aapt resource value: 0x7f070004
+			public const int green = 2131165188;
 			
-			// aapt resource value: 0x7f060002
-			public const int red = 2131099650;
+			// aapt resource value: 0x7f070002
+			public const int red = 2131165186;
 			
 			static Color()
 			{
@@ -130,50 +130,50 @@ namespace DisertationProject
 		public partial class Id
 		{
 			
-			// aapt resource value: 0x7f08000b
-			public const int cameraButton = 2131230731;
+			// aapt resource value: 0x7f09000b
+			public const int cameraButton = 2131296267;
 			
-			// aapt resource value: 0x7f08000e
-			public const int imageView1 = 2131230734;
+			// aapt resource value: 0x7f09000e
+			public const int imageView1 = 2131296270;
 			
-			// aapt resource value: 0x7f080004
-			public const int linearLayout1 = 2131230724;
+			// aapt resource value: 0x7f090004
+			public const int linearLayout1 = 2131296260;
 			
-			// aapt resource value: 0x7f08000a
-			public const int linearLayout2 = 2131230730;
+			// aapt resource value: 0x7f09000a
+			public const int linearLayout2 = 2131296266;
 			
-			// aapt resource value: 0x7f080002
-			public const int linearLayout3 = 2131230722;
+			// aapt resource value: 0x7f090002
+			public const int linearLayout3 = 2131296258;
 			
-			// aapt resource value: 0x7f080000
-			public const int linearLayout4 = 2131230720;
+			// aapt resource value: 0x7f090000
+			public const int linearLayout4 = 2131296256;
 			
-			// aapt resource value: 0x7f080009
-			public const int nextButton = 2131230729;
+			// aapt resource value: 0x7f090009
+			public const int nextButton = 2131296265;
 			
-			// aapt resource value: 0x7f080007
-			public const int pauseButton = 2131230727;
+			// aapt resource value: 0x7f090007
+			public const int pauseButton = 2131296263;
 			
-			// aapt resource value: 0x7f080006
-			public const int playButton = 2131230726;
+			// aapt resource value: 0x7f090006
+			public const int playButton = 2131296262;
 			
-			// aapt resource value: 0x7f080005
-			public const int previousButton = 2131230725;
+			// aapt resource value: 0x7f090005
+			public const int previousButton = 2131296261;
 			
-			// aapt resource value: 0x7f08000c
-			public const int repeatButton = 2131230732;
+			// aapt resource value: 0x7f09000c
+			public const int repeatButton = 2131296268;
 			
-			// aapt resource value: 0x7f08000d
-			public const int shuffleButton = 2131230733;
+			// aapt resource value: 0x7f09000d
+			public const int shuffleButton = 2131296269;
 			
-			// aapt resource value: 0x7f080001
-			public const int songListView = 2131230721;
+			// aapt resource value: 0x7f090001
+			public const int songListView = 2131296257;
 			
-			// aapt resource value: 0x7f080003
-			public const int songPositionSeekBar = 2131230723;
+			// aapt resource value: 0x7f090003
+			public const int songPositionSeekBar = 2131296259;
 			
-			// aapt resource value: 0x7f080008
-			public const int stopButton = 2131230728;
+			// aapt resource value: 0x7f090008
+			public const int stopButton = 2131296264;
 			
 			static Id()
 			{
@@ -220,11 +220,11 @@ namespace DisertationProject
 		public partial class Raw
 		{
 			
-			// aapt resource value: 0x7f050000
-			public const int Jessica_Jay_Casablanca = 2131034112;
+			// aapt resource value: 0x7f060000
+			public const int Jessica_Jay_Casablanca = 2131099648;
 			
-			// aapt resource value: 0x7f050001
-			public const int Vaya_Con_Dios_Puerto_Rico = 2131034113;
+			// aapt resource value: 0x7f060001
+			public const int Vaya_Con_Dios_Puerto_Rico = 2131099649;
 			
 			static Raw()
 			{
@@ -239,11 +239,11 @@ namespace DisertationProject
 		public partial class String
 		{
 			
-			// aapt resource value: 0x7f070001
-			public const int app_name = 2131165185;
+			// aapt resource value: 0x7f080001
+			public const int app_name = 2131230721;
 			
-			// aapt resource value: 0x7f070000
-			public const int hello = 2131165184;
+			// aapt resource value: 0x7f080000
+			public const int hello = 2131230720;
 			
 			static String()
 			{
@@ -251,6 +251,22 @@ namespace DisertationProject
 			}
 			
 			private String()
+			{
+			}
+		}
+		
+		public partial class Xml
+		{
+			
+			// aapt resource value: 0x7f050000
+			public const int file_paths = 2131034112;
+			
+			static Xml()
+			{
+				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
+			}
+			
+			private Xml()
 			{
 			}
 		}
