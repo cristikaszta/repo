@@ -157,9 +157,12 @@ namespace DisertationProject
             //intent.PutExtra(MediaStore.ExtraOutput, Uri.FromFile(App._file));
             intent.PutExtra(MediaStore.ExtraOutput, imageUri);
 
+            if (CheckSelfPermission(permissions[0]) == (int)Permission.Granted)
+            {
 
+                StartActivityForResult(intent, 0);
 
-            StartActivityForResult(intent, 0);
+            }
 
 
 
@@ -210,7 +213,9 @@ namespace DisertationProject
 
                 Button button = FindViewById<Button>(Resource.Id.cameraButton);
                 _imageView = FindViewById<ImageView>(Resource.Id.imageView1);
-                button.Click += TakeAPicture;
+               
+                    button.Click += TakeAPicture;
+                
             }
         }
 
