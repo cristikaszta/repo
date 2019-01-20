@@ -130,17 +130,14 @@ namespace DisertationProject
 		public partial class Id
 		{
 			
-			// aapt resource value: 0x7f09000b
-			public const int cameraButton = 2131296267;
+			// aapt resource value: 0x7f09000a
+			public const int cameraButton = 2131296266;
 			
-			// aapt resource value: 0x7f09000e
-			public const int imageView1 = 2131296270;
+			// aapt resource value: 0x7f09000d
+			public const int imageView1 = 2131296269;
 			
 			// aapt resource value: 0x7f090004
 			public const int linearLayout1 = 2131296260;
-			
-			// aapt resource value: 0x7f09000a
-			public const int linearLayout2 = 2131296266;
 			
 			// aapt resource value: 0x7f090002
 			public const int linearLayout3 = 2131296258;
@@ -160,11 +157,11 @@ namespace DisertationProject
 			// aapt resource value: 0x7f090005
 			public const int previousButton = 2131296261;
 			
-			// aapt resource value: 0x7f09000c
-			public const int repeatButton = 2131296268;
+			// aapt resource value: 0x7f09000b
+			public const int repeatButton = 2131296267;
 			
-			// aapt resource value: 0x7f09000d
-			public const int shuffleButton = 2131296269;
+			// aapt resource value: 0x7f09000c
+			public const int shuffleButton = 2131296268;
 			
 			// aapt resource value: 0x7f090001
 			public const int songListView = 2131296257;

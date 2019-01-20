@@ -40,6 +40,8 @@ namespace DisertationProject
         /// </summary>
         private TextView _textView;
 
+        private int _pictureCount;
+
         /// <summary>
         /// Song list adapter
         /// </summary>
@@ -54,16 +56,16 @@ namespace DisertationProject
         /// Playlist
         /// </summary>
         /// <value>
-        /// The play list.
+        /// The playlist.
         /// </value>
-        public Playlist _playList { get; set; }
+        private Playlist _playList;
 
         /// <summary>
         /// The song completion receiver
         /// </summary>
         private SongCompletionReceiver _songCompletionReceiver;
 
-        readonly string[] permissions =
+        private readonly string[] _permissions =
         {
             Manifest.Permission.Camera,
             Manifest.Permission.ReadExternalStorage,
@@ -98,7 +100,7 @@ namespace DisertationProject
             // and cause the application to crash.
 
             int height = Resources.DisplayMetrics.HeightPixels;
-            int width = _imageView.Height;
+            int width = _imageView.Width;
             App.bitmap = App._file.Path.LoadAndResizeBitmap(width, height);
             if (App.bitmap != null)
             {
@@ -147,36 +149,28 @@ namespace DisertationProject
         {
             Intent intent = new Intent(MediaStore.ActionImageCapture);
 
-            App._file = new File(App._dir, string.Format("myPhoto_{0}.jpg", Guid.NewGuid()));
+            App._file = new File(App._dir, string.Format("myPhoto_{0}_{1}.jpg", DateTime.Now.ToString("yyyy_mm_dd"), _pictureCount++));
 
             Uri imageUri = Android.Support.V4.Content.FileProvider.GetUriForFile(
             this,
-            "com.example.homefolder.example.provider", //(use your app signature + ".provider" )
+            "DisertationProject.provider", //(use your app signature + ".provider" )
             App._file);
 
-            //intent.PutExtra(MediaStore.ExtraOutput, Uri.FromFile(App._file));
             intent.PutExtra(MediaStore.ExtraOutput, imageUri);
 
-            if (CheckSelfPermission(permissions[0]) == (int)Permission.Granted)
+            if (CheckSelfPermission(_permissions[0]) == (int)Permission.Granted)
             {
 
                 StartActivityForResult(intent, 0);
 
             }
-
-
-
-            //var photo = await Plugin.Media.CrossMedia.Current.TakePhotoAsync(new Plugin.Media.Abstractions.StoreCameraMediaOptions() { });
-
-            //if (photo != null)
-            //    PhotoImage.Source = ImageSource.FromStream(() => { return photo.GetStream(); });
         }
 
         /// <summary>
         /// Called when the activity is starting.
         /// </summary>
         /// <param name="savedInstanceState">If the activity is being re-initialized after
-        protected override async void OnCreate(Bundle savedInstanceState)
+        protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.Main);
@@ -199,13 +193,13 @@ namespace DisertationProject
                     return;
                 }
                 _playList.IncrementPosition();
-                var source = _playList.GetCurrentSong().Source;
-                SendCommand(ActionEvent.ActionPlay, source);
+                var song = _playList.GetCurrentSong();
+                SendCommand(ActionEvent.ActionPlay, song);
             };
 
             RegisterReceiver(_songCompletionReceiver, new IntentFilter("GetNext"));
 
-            RequestPermissions(permissions, 0);
+            RequestPermissions(_permissions, 0);
 
             if (IsThereAnAppToTakePictures())
             {
@@ -213,9 +207,9 @@ namespace DisertationProject
 
                 Button button = FindViewById<Button>(Resource.Id.cameraButton);
                 _imageView = FindViewById<ImageView>(Resource.Id.imageView1);
-               
-                    button.Click += TakeAPicture;
-                
+
+                button.Click += TakeAPicture;
+
             }
         }
 
@@ -264,12 +258,9 @@ namespace DisertationProject
             var playButton = FindViewById<Button>(Resource.Id.playButton);
             playButton.Click += (sender, args) =>
             {
-                var name = _playList.GetCurrentSong().Title;
-                var source = _playList.GetCurrentSong().Source;
-                SendCommand(ActionEvent.ActionPlay, source, name);
+                var song = _playList.GetCurrentSong();
+                SendCommand(ActionEvent.ActionPlay, song);
             };
-
-            //playButton.Click += ChangeColorOfButton;
 
             var pauseButton = FindViewById<Button>(Resource.Id.pauseButton);
             pauseButton.Click += (sender, args) => SendCommand(ActionEvent.ActionPause);
@@ -292,10 +283,9 @@ namespace DisertationProject
                 {
                     return;
                 }
-                string name = _playList.GetCurrentSong().Title;
-                string source = _playList.GetCurrentSong().Source;
+                var song = _playList.GetCurrentSong();
                 SendCommand(ActionEvent.ActionStop);
-                SendCommand(ActionEvent.ActionPlay, source, name);
+                SendCommand(ActionEvent.ActionPlay, song);
             };
 
             var nextButton = FindViewById<Button>(Resource.Id.nextButton);
@@ -313,10 +303,8 @@ namespace DisertationProject
                 {
                     return;
                 }
-                var name = _playList.GetCurrentSong().Title;
-                var source = _playList.GetCurrentSong().Source;
-                SendCommand(ActionEvent.ActionStop);
-                SendCommand(ActionEvent.ActionPlay, source, name);
+                var song = _playList.GetCurrentSong();
+                SendCommand(ActionEvent.ActionPlay, song);
             };
 
             var repeatButton = FindViewById<ToggleButton>(Resource.Id.repeatButton);
@@ -343,7 +331,6 @@ namespace DisertationProject
         /// </summary>
         public void SetupTextContainers()
         {
-            //_textView = FindViewById<TextView>(Resource.Id.textView1);
             _listView = FindViewById<ListView>(Resource.Id.songListView);
             _songListAdapter = new SonglistAdapter(this, _playList.GetSongList());
             _listView.Adapter = _songListAdapter;
@@ -352,9 +339,8 @@ namespace DisertationProject
                 SendCommand(ActionEvent.ActionStop);
                 var currentPosition = args.Position;
                 _playList.SetPosition(currentPosition);
-                var name = _playList.GetCurrentSong().Title;
-                var source = _playList.GetCurrentSong().Source;
-                SendCommand(ActionEvent.ActionPlay, source, name);
+                var song = _playList.GetCurrentSong();
+                SendCommand(ActionEvent.ActionPlay, song);
             };
         }
 
@@ -390,13 +376,14 @@ namespace DisertationProject
         /// <param name="action">The action.</param>
         /// <param name="source">The source.</param>
         /// <param name="name">The name.</param>
-        public void SendCommand(ActionEvent action, string source, string name)
+        public void SendCommand(ActionEvent action, Song song)
         {
             //var stringifiedAction = Helper.ConvertActionEvent(action);
             var stringifiedAction = action.ToString();
             var intent = new Intent(stringifiedAction, null, this, typeof(MusicService));
-            intent.PutExtra("source", source);
-            intent.PutExtra("name", name);
+            intent.PutExtra("source", song.Source);
+            intent.PutExtra("title", song.Title);
+            intent.PutExtra("artist", song.Artist);
             StartService(intent);
         }
     }

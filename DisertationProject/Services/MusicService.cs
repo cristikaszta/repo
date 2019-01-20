@@ -31,22 +31,12 @@ namespace DisertationProject.Services
         /// <summary>
         /// The media player
         /// </summary>
-        private MediaPlayer MediaPlayer;
+        private MediaPlayer mediaPlayer;
 
         /// <summary>
         /// The audio manager
         /// </summary>
         private AudioManager audioManager;
-
-        /// <summary>
-        /// The song name
-        /// </summary>
-        private string _songName = "SongName";
-
-        /// <summary>
-        /// The artist name
-        /// </summary>
-        private string _artistName = "ArtistName";
 
         /// <summary>
         /// State
@@ -65,7 +55,6 @@ namespace DisertationProject.Services
         {
             base.OnCreate();
             InitializeMediaPlayer();
-            //PlayList = new Playlist();
         }
 
         /// <summary>
@@ -74,23 +63,23 @@ namespace DisertationProject.Services
         private void InitializeMediaPlayer()
         {
             audioManager = (AudioManager)Application.Context.GetSystemService(AudioService);
-            MediaPlayer = new MediaPlayer();
+            mediaPlayer = new MediaPlayer();
 
-            MediaPlayer.SetAudioStreamType(Stream.Music);
+            mediaPlayer.SetAudioStreamType(Stream.Music);
 
             //Wake mode will be partial to keep the CPU still running under lock screen
-            MediaPlayer.SetWakeMode(Application.Context, WakeLockFlags.Partial);
+            mediaPlayer.SetWakeMode(Application.Context, WakeLockFlags.Partial);
 
-            MediaPlayer.Prepared += (sender, args) => MediaPlayer.Start();
+            mediaPlayer.Prepared += (sender, args) => mediaPlayer.Start();
 
-            MediaPlayer.Completion += (sender, args) =>
+            mediaPlayer.Completion += (sender, args) =>
             {
                 Intent intent = new Intent("GetNext");
                 intent.PutExtra("GetNext", 0);
                 SendBroadcast(intent);
             };
 
-            MediaPlayer.Error += (sender, args) =>
+            mediaPlayer.Error += (sender, args) =>
             {
                 Stop();
             };
@@ -112,7 +101,9 @@ namespace DisertationProject.Services
             {
                 case ActionEvent.ActionPlay:
                     var source = intent.GetStringExtra("source");
-                    Play(source);
+                    var title = intent.GetStringExtra("title");
+                    var artist = intent.GetStringExtra("artist");
+                    Play(source, title, artist);
                     break;
 
                 case ActionEvent.ActionStop: Stop(); break;
@@ -126,7 +117,7 @@ namespace DisertationProject.Services
         /// Plays the specified URI.
         /// </summary>
         /// <param name="uri">The URI.</param>
-        private async void Play(string uri)
+        private async void Play(string uri, string name, string artist)
         {
             if (!NetworkController.Instance.IsConnected)
             {
@@ -135,22 +126,21 @@ namespace DisertationProject.Services
             }
             if (State == PlayState.Paused)
             {
-                MediaPlayer.Start();
+                mediaPlayer.Start();
                 State = PlayState.Playing;
-                //StartForeground();
                 return;
             }
 
-            if (MediaPlayer.IsPlaying) return;
+            if (mediaPlayer.IsPlaying) return;
 
             try
             {
-                MediaPlayer.Reset();
-                await MediaPlayer.SetDataSourceAsync(Application.Context, Android.Net.Uri.Parse(uri));
-                MediaPlayer.PrepareAsync();
+                mediaPlayer.Reset();
+                await mediaPlayer.SetDataSourceAsync(Application.Context, Android.Net.Uri.Parse(uri));
+                mediaPlayer.PrepareAsync();
                 NetworkController.Instance.AquireWifiLock();
-                StartForeground("Playing ", _artistName, _songName);
-                NetworkController.Instance.AquireWifiLock();
+                var text = string.Format("{0} - {1}", artist, name);
+                StartForeground(text);
             }
             catch (Java.Lang.IllegalStateException ex)
             {
@@ -159,26 +149,13 @@ namespace DisertationProject.Services
         }
 
         /// <summary>
-        /// Plays the specified URI.
-        /// </summary>
-        /// <param name="uri">The URI.</param>
-        /// <param name="name">The name.</param>
-        /// <param name="artist">The artist.</param>
-        private void Play(string uri, string name, string artist)
-        {
-            _songName = name;
-            _artistName = artist;
-            Play(uri);
-        }
-
-        /// <summary>
         /// Pause action method
         /// </summary>
         private void Pause()
         {
-            if (MediaPlayer.IsPlaying)
+            if (mediaPlayer.IsPlaying)
             {
-                MediaPlayer.Pause();
+                mediaPlayer.Pause();
                 State = PlayState.Paused;
             }
         }
@@ -188,9 +165,9 @@ namespace DisertationProject.Services
         /// </summary>
         private void Stop()
         {
-            if (MediaPlayer.IsPlaying)
-                MediaPlayer.Stop();
-            MediaPlayer.Reset();
+            if (mediaPlayer.IsPlaying)
+                mediaPlayer.Stop();
+            mediaPlayer.Reset();
             State = PlayState.Stopped;
             StopForeground(true);
             NetworkController.Instance.ReleaseWifiLock();
@@ -207,7 +184,7 @@ namespace DisertationProject.Services
             var duration = 0;
             try
             {
-                duration = MediaPlayer.Duration;
+                duration = mediaPlayer.Duration;
             }
             catch (Exception ex)
             {
@@ -227,7 +204,7 @@ namespace DisertationProject.Services
             var position = 0;
             try
             {
-                position = MediaPlayer.CurrentPosition;
+                position = mediaPlayer.CurrentPosition;
             }
             catch (Exception)
             {
@@ -255,10 +232,10 @@ namespace DisertationProject.Services
         public override void OnDestroy()
         {
             base.OnDestroy();
-            if (MediaPlayer != null)
+            if (mediaPlayer != null)
             {
-                MediaPlayer.Release();
-                MediaPlayer = null;
+                mediaPlayer.Release();
+                mediaPlayer = null;
             }
         }
 
@@ -270,10 +247,10 @@ namespace DisertationProject.Services
         /// <param name="title">The title.</param>
         /// <param name="artist">The artist.</param>
         /// <param name="song">The song.</param>
-        private void StartForeground(string title, string artist, string song)
+        private void StartForeground(string text)
         {
             var pendingIntent = PendingIntent.GetActivity(Application.Context, 0, new Intent(Application.Context, typeof(MainActivity)), PendingIntentFlags.UpdateCurrent);
-            var text = string.Format("{0} - {1}", artist, song);
+           
             var notification = new Notification
             {
                 TickerText = new Java.Lang.String(text),
@@ -281,9 +258,7 @@ namespace DisertationProject.Services
             };
 
             notification.Flags |= NotificationFlags.OngoingEvent;
-#pragma warning disable CS0618 // Type or member is obsolete
             notification.SetLatestEventInfo(Application.Context, "Playing", text, pendingIntent);
-#pragma warning restore CS0618 // Type or member is obsolete
             StartForeground(notificationId, notification);
         }
     }

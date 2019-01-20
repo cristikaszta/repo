@@ -83,6 +83,7 @@
     <Compile Include="App.cs" />
     <Compile Include="BroadcastReceiver\SongCompletionReceiver.cs" />
     <Compile Include="Controllers\CameraController.cs" />
+    <Compile Include="Controllers\ColorController.cs" />
     <Compile Include="Helpers\BitmapHelpers.cs" />
     <Compile Include="Controllers\DataController.cs" />
     <Compile Include="Controllers\LocationController.cs" />
@@ -101,7 +102,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="GettingStarted.Xamarin" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Resources\AboutResources.txt" />
     <None Include="Properties\AndroidManifest.xml" />
     <None Include="Assets\AboutAssets.txt" />
